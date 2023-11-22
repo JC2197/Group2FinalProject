@@ -3,8 +3,8 @@ from .forms import *
 # Create your views here.
 
 
-def landing(request):
-    return render(request,'landing.html')
+def search(request):
+    return render(request,'search-results.html')
 
 
 def signup(request):
