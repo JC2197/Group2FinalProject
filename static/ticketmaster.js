@@ -1,104 +1,108 @@
-$('button').click(function () {
+const emptySearchTerm = $('#classification-empty');
+const emptySearchCity = $('#city-empty');
+const resultsContainer = $('#results-container');
+const desiredImageHeight = 1152;
 
-    // Clear before adding in case the user clicks the button twice
-    $('#card-container').empty();
-    $('#warning').empty();
-    // Get the search term and location from the input elements
-    const searchTerm = $('input[name=param1]').val();
-    const location = $('input[name=param2]').val();
-    const API_KEY = 'quU5tiOXflAPKAoI2tFbvXXZ3SkwwhOR'
+$('button').on('click',function () {
 
-    if(searchTerm === '' || location ===''){
-        if(searchTerm ===''){
-            $('#warning').append(''+
-            '   <div class="bg-danger-subtle border border-danger rounded p-2 m-1 text-danger fw-bold">'+
-            '    Please enter a search term.'+
-            '   </div>')
-        }else{
-            $('#warning').append(''+
-            '   <div class="bg-danger-subtle border border-danger rounded p-2 m-1 text-danger fw-bold">'+
-            '    City cannot be empty. Please enter a city.'+
-            '   </div>')
-        }
-    } else{
-        $.ajax({
-        url:`https://app.ticketmaster.com/discovery/v2/events.json?size=20&sort=date,asc&keyword=${searchTerm}&city=${location}&apikey=${API_KEY}`,
-        dataType: 'json',
-        method: 'GET',
-        success: function (data) {
-            const totalResults = data.page.totalElements;
-            if (totalResults > 0) {
-                const events = data._embedded.events
-                $('#card-container').append('' +
-                    `    <h1 class="h3 text-secondary m-3 p-3">Total Results: ${totalResults}</h1>`)
-                $.each(events, function (i) {
+    emptySearchTerm.addClass("d-none");
+    emptySearchCity.addClass("d-none");
+    $('#results').empty();
 
-                    const item = events[i]
-                    console.log(item)
-                    const name = item.name
-                    const image = item.images[0].url
-                    const startDate = new Date(item.dates.start.dateTime).toDateString();
-                    const startTime = convertTo12HourFormat(item.dates.start.localTime)
-                    const venue = item._embedded.venues[0].name
-                    const venueCity = item._embedded.venues[0].city.name
-                    const venueState = item._embedded.venues[0].state.name
-                    const link = item.url
-                    const address = item._embedded.venues[0].address.line1
-                    console.log(name)
-                    console.log(image)
-                    console.log(venue)
-                    console.log(venueCity)
-                    console.log(venueState)
-                    console.log(link)
+    const classificationName = $('input[aria-label=classificationName]').val();
+    const city = $('input[aria-label=city]').val();
+    const sort = "date,asc";
+    const apiKey = "uR0EVsl1GNv6kaCf2DggXqQURjGEw1fe";
 
-                    //Store each business's object in a variable
-                    //Append our result into our page
-                    $('#card-container').append('' +
-                        '      <div class="shadow">\n' +
-                        '            <div class="card mb-3">\n' +
-                        '                        <div class="row">\n' +
-                        '                            <div class="col-md-4 align-items-center">\n' +
-                        `                                <img src="${image}" class="card-img rounded p-1" alt="business-image">\n` +
-                        '                            </div>\n' +
-                        '                            <div class="col-md-4 col-6 align-items-center ">\n' +
-                        '                                <div class="card-body">\n' +
-                        '                                    <div class="row">\n' +
-                        '                                        <div>\n' +
-                        `                                            <h4 class="card-title text-wrap">${name}</h4>\n` +
-                        '                                        </div>\n' +
-                        '                                    </div>\n' +
-                        `                                    <h4 class="card-text text-muted">${venue}</h4>\n` +
-                        `                                    <p class="card-text text-muted">${address}</p>\n` +
-                        `                                    <p class="card-text text-muted">${venueCity}, ${venueState}</p>\n` +
-                        `                                    <a href="${link}">\n` +
-                        '                                       <button class="btn btn-primary">Find Tickets</button>\n' +
-                        '                                    </a>\n' +
-                        '                                </div>\n' +
-                        '                            </div>\n' +
-                        '                            <div class="col-md-4 col-6 p-3 ">\n' +
-                        '                                    <div class="row">\n' +
-                        `                                         <h2 style="text-align: right;" class="text-success">${startDate}</h2>\n` +
-                        '                                    </div>\n' +
-                        '                                    <div class="row d-flex">\n' +
-                        `                                         <p style="text-align: right;" class=" text-success">${startTime}</p>\n` +
-                        '                                    </div>\n' +
-                        '                            </div>\n' +
-                        '                        </div>\n' +
-                        '                    </div');
-                 });
-            } else {
-                $('#card-container').append('<h5>No results were found!</h5>');
-            }
-        }
-    });
+    if (classificationName === "") {
+        emptySearchTerm.removeClass("d-none");
+        resultsContainer.addClass("d-none");
+        return;
     }
+    if (city === "") {
+        emptySearchCity.removeClass("d-none");
+        resultsContainer.addClass("d-none");
+        return;
+    }
+
+    $.ajax({
+        type: "GET",
+        url: 'https://app.ticketmaster.com/discovery/v2/events.json?apikey=' + apiKey,
+        async: true,
+        dataType: "json",
+        data: {'classificationName': classificationName, 'city': city, 'sort': sort},
+        success: function (data) {
+            resultsContainer.removeClass("d-none");
+            let eventsFound = data.page.totalElements;
+            if (eventsFound > 20) {eventsFound = 20}    // the ticketMasterAPI only allows 20 results per page by default
+            if (eventsFound <= 0) {
+                $('#results').append('<h4>Sorry... no results were found for the entered search term and city.</h4>');
+            } else {
+                $('#results').append('<h4 class="text-secondary">' + eventsFound + ' events found</h4>');
+                $.each(data._embedded.events, function (i, event) {
+
+                    const eventName = event.name;
+
+                    let eventImage = event.images[0].url;
+                    for (const image of event.images) {
+                        if (image.height === desiredImageHeight) {
+                            eventImage = image.url;
+                            break;
+                        }
+                    }
+
+                    let eventDate = event.dates.start.dateTime;
+                    eventDate = new Date(eventDate).toDateString();
+
+                    let eventTime = event.dates.start.localTime;
+                    const eventTimeArray = eventTime.split(':');
+                    const hours = eventTimeArray[0];
+                    const minutes = eventTimeArray[1];
+                    if (hours === 0 || hours === 24) {
+                        eventTime = "12:" + minutes + " AM";
+                    } else if (hours === 12) {
+                        eventTime = "12:" + minutes + " PM";
+                    } else if (hours > 12) {
+                        eventTime = hours - 12 + ":" + minutes + " PM";
+                    } else {
+                        eventTime = hours + ":" + minutes + " AM";
+                    }
+
+                    const venue = event._embedded.venues[0];
+                    const venueName = venue.name;
+                    const venueCity = venue.city.name;
+                    const venueState = venue.state.name;
+                    const venueAddress = venue.address.line1;
+
+                    const ticketLink = event.url;
+
+                    $('#results').append('' +
+                        '<div class="card mb-3 shadow">\n' +
+                        '    <div class="row g-0">\n' +
+                        '        <div class="col-md-4 d-flex align-items-center">\n' +
+                        '            <img src="' + eventImage + '" class="card-img p-1" alt="event image">\n' +
+                        '        </div>\n' +
+                        '        <div class="col-md-8">\n' +
+                        '            <div class="card-body">\n' +
+                        '                <div class="row">\n' +
+                        '                    <div class="col-6 d-flex align-items-center">\n' +
+                        '                        <h4>' + eventName + '</h4>\n' +
+                        '                    </div>\n' +
+                        '                    <div class="col-6 text-success text-end">\n' +
+                        '                        <h4>' + eventDate + '</h4>\n' +
+                        '                        <h5>' + eventTime + '</h5>\n' +
+                        '                    </div>\n' +
+                        '                </div>\n' +
+                        '                <h4 class="text-secondary">' + venueName + '</h4>\n' +
+                        '                <p class="text-secondary mt-4">' + venueAddress + '<br>' + venueCity + ', ' + venueState + '</p>\n' +
+                        '                <a href="' + ticketLink + '" class="btn btn-primary">Find tickets</a>\n' +
+                        '            </div>\n' +
+                        '        </div>\n' +
+                        '    </div>\n' +
+                        '</div>'
+                    );
+                });
+            }
+        },
+    });
 });
-function convertTo12HourFormat(time24Hour) {
-  const [hours, minutes] = time24Hour.split(":");
-  const parsedHours = parseInt(hours, 10);
-  const parsedMinutes = parseInt(minutes, 10);
-  const period = parsedHours >= 12 ? "PM" : "AM";
-  const hours12Hour = parsedHours === 0 ? 12 : parsedHours > 12 ? parsedHours - 12 : parsedHours;
-  const time12Hour = `${hours12Hour.toString().padStart(2, "0")}:${minutes.padStart(2, "0")} ${period}`;
-  return time12Hour;
-}

@@ -21,5 +21,5 @@ from finalproject import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.signup),
-    path('search', views.search),
+    path('search-results/', views.search, name='search-results'),
 ]
