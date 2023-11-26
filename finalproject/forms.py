@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.contrib.auth.forms import UserCreationForm
 
 
 class SearchForm(forms.ModelForm):
@@ -33,11 +34,13 @@ class SignInForm(forms.ModelForm):
         }
 
 
-class SignUpForm(forms.ModelForm):
+class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        fields = '__all__'
         model = User
-        widgets = {
-            'username': forms.TextInput(),
-            'password': forms.PasswordInput(),
-        }
+        fields = ('username', 'password1', 'password2')  # Customize the list of fields as needed
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'custom-class'})
+        self.fields['password1'].widget.attrs.update({'class': 'custom-class'})
+        self.fields['password2'].widget.attrs.update({'class': 'custom-class'})
