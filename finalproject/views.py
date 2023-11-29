@@ -34,20 +34,12 @@ def search(request):
             messages.info(request, 'Sorry... no results were found for the entered search term and city.')
             return redirect('search-results')
         else:
-            # print the response for testing purpose (open "Run" at the bottom to see what is printed)
             print(search_results)
-            # Store each user's information in a variable
             events = search_results['_embedded']['events']
 
-            # Initialize an empty list to store user data
             event_list = []
 
-            # Iterate through each user in the 'users' list coming from the api
-            # Rather than directly passing the "users" array to the template,
-            # the following approach allows server-side processing and formatting of specific data (e.g., date).
-            # So, the template only needs to plug in the preprocessed information.
             for event in events:
-                # Extract relevant information from the user dictionary
                 event_name = event['name']
                 event_image = event['images'][0]['url']
                 for image in event['images']:
@@ -76,7 +68,6 @@ def search(request):
                 venue_address = venue['address']['line1']
                 ticket_link = event['url']
 
-                # Create a new dictionary to store user details
                 event_details = {
                     'event_name': event_name,
                     'event_image': event_image,
@@ -89,14 +80,11 @@ def search(request):
                     'ticket_link': ticket_link
                 }
 
-                # Append the user details dictionary to the user_list
                 event_list.append(event_details)
 
-            # Create a context dictionary with the user_list and render the 'index.html' template
             context = {'events': event_list, 'events_found': events_found}
             return render(request, 'search-results.html', context)
 
-    # all other cases, just render the page without sending/passing any context to the template
     return render(request, 'search-results.html')
 
 
@@ -129,3 +117,6 @@ def signup(request):
     context = {'form': form}
     return render(request, 'landing.html', context)
 
+
+def save_event(request):
+    return render(request, 'saved-events.html')

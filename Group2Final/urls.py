@@ -24,4 +24,5 @@ urlpatterns = [
     path('', views.signup),
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('search-results/', views.search, name='search-results'),
+    path('saved-events/', views.save_event, name='saved-events'),
 ]
