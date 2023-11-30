@@ -3,7 +3,8 @@
 {% block body %}
 <div class="container-fluid bg-primary text-white">
     <div class="row justify-content-center">
-        <div class="col-lg-9">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
             <h1 class="display-5 text-center pt-5">Ticketmaster</h1>
             <h2 class="fw-bold text-center pb-5">Quickly find tickets around you</h2>
                 <form action="" method="post">
@@ -11,14 +12,18 @@
                     {% block content %}
                       <h2>Sign Up</h2>
                       {{ form.as_div }}
-                      <input type="submit" class="btn btn-secondary m-2" value="Sign Up">
+                      <input type="submit" class="btn btn-warning m-2" value="Sign Up">
                     {% endblock %}
 
                 </form>
-                <a href="{% url 'login' %}">
-                    <button class="btn btn-secondary m-2">Sign In</button>
+            <div class="fs-5 text-center text-dark">
+                Already Have An Account?
+                <a class="text-dark link-dark link-underline-opacity-0 link-underline-opacity-100-hover" href="{% url 'login' %}">
+                    Sign In Here
                 </a>
+            </div>
         </div>
+        <div class="col-lg-4"></div>
     </div>
 </div>
 {% endblock %}

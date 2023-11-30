@@ -1,6 +1,7 @@
 from django import forms
 from .models import *
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 
 
 class SearchForm(forms.ModelForm):
@@ -24,14 +25,13 @@ class SearchForm(forms.ModelForm):
         }
 
 
-class SignInForm(forms.ModelForm):
-    class Meta:
-        fields = '__all__'
-        model = User
-        widgets = {
-            'username': forms.TextInput(),
-            'password': forms.PasswordInput(),
-        }
+class BootstrapAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Add Bootstrap classes to the widgets
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control'})
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -41,6 +41,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'class': 'custom-class'})
-        self.fields['password1'].widget.attrs.update({'class': 'custom-class'})
-        self.fields['password2'].widget.attrs.update({'class': 'custom-class'})
+        self.fields['username'].widget.attrs.update({'class': 'form-control m-2'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control m-2'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control m-2'})
+

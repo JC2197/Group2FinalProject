@@ -2,20 +2,33 @@
 
 {% block body %}
 <div class="container-fluid bg-primary text-white">
-    <div class="row justify-content-center">
-        <div class="col-lg-9">
-            <h1 class="display-5 text-center pt-5">Ticketmaster</h1>
-            <h2 class="fw-bold text-center pb-5">Quickly find tickets around you</h2>
-            {% block content %}
-                <h2>Log In</h2>
-                <form action="{% url 'login' %}" method="post">
-                    {% csrf_token %}
+    <div class="container">
+    <h1 class="display-5 text-center pt-5">Ticketmaster</h1>
+    <h2 class="fw-bold text-center pb-5">Quickly find tickets around you</h2>
+        <div class="row justify-content-center">
+            <div class="col-4"></div>
+            <div class="col-4">
+                {% block content %}
+                    <form action="{% url 'login' %}" method="post" class="form-group">
+                        {% csrf_token %}
 
-                      <h2>Sign In</h2>
-                      {{ form.as_p }}
-                      <input type="submit" class="btn btn-primary m-2" value="Submit">
-                </form>
-            {% endblock %}
+                        <h2 class="text-center">Sign In</h2>
+                        <div class="form-group">
+                            {{ form.as_div }}
+                        </div>
+
+                        <div class="container text-center">
+                            <input type="submit" class="btn btn-warning m-2" value="Submit"></div>
+                    </form>
+                    <div class="container text-center text-dark">
+                        No Account?
+                        <a class="link-dark link-underline-opacity-0 link-underline-opacity-100-hover" href="/">Sign Up Here</a>
+                    </div>
+                {% endblock %}
+
+            </div>
+            <div class="col-4"></div>
+
         </div>
     </div>
 </div>

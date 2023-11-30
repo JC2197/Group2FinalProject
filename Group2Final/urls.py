@@ -18,11 +18,20 @@ from django.contrib import admin
 from django.urls import path
 from finalproject import views
 from django.contrib.auth.views import LoginView
+from finalproject.forms import BootstrapAuthenticationForm
+from django.views.generic import RedirectView
+from finalproject.views import signup
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.signup),
-    path('login/', LoginView.as_view(template_name='login.html'), name='login'),
+
+    path('', RedirectView.as_view(url='/signup/'), name='redirect_to_signup'),
+    path('signup/', signup, name='signup'),
+    path('login/', LoginView.as_view(
+        authentication_form=BootstrapAuthenticationForm,
+        template_name='login.html'
+    ), name='login'),
     path('search-results/', views.search, name='search-results'),
     path('saved-events/', views.save_event, name='saved-events'),
 ]
