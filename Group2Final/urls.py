@@ -22,7 +22,6 @@ from finalproject.forms import BootstrapAuthenticationForm
 from django.views.generic import RedirectView
 from finalproject.views import signup
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -32,6 +31,11 @@ urlpatterns = [
         authentication_form=BootstrapAuthenticationForm,
         template_name='login.html'
     ), name='login'),
+
     path('search-results/', views.search, name='search-results'),
-    path('saved-events/', views.save_event, name='saved-events'),
+
+    path('add-event/', views.add_event, name='add-event'),  # C, add events to database
+    path('view-events/', views.view_events, name='view-events'),  # R, retrieve events from database to view
+    path('update/<int:id>', views.update_event, name='update-event'),  # U, update event to favorites or unfavorite
+    path('delete/<int:id>', views.delete_event, name='delete-event'),  # D, delete event from saved events database
 ]

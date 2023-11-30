@@ -10,12 +10,12 @@ class UserProfile(models.Model):
 
 
 class SavedEvents(models.Model):
-    event_name = ""
-    event_image = ""
-    event_date = ""
-    event_time = ""
-    venue_name = ""
-    venue_city = ""
-    venue_state = ""
-    venue_address = ""
-    ticket_link = ""
+    name = models.CharField(max_length=64, default='')
+    image = models.CharField(max_length=64, default='')
+    date = models.CharField(max_length=64, default='')
+    time = models.CharField(max_length=64, default='')
+    venue = models.CharField(max_length=64, default='')
+    city = models.CharField(max_length=64, default='')
+    state = models.CharField(max_length=64, default='')
+    address = models.CharField(max_length=64, default='')
+    link = models.CharField(max_length=128, default='')

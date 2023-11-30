@@ -1,19 +1,26 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    Saved Events
+{% endblock %}
+
 {% block body %}
 
-<table class="table"></table>
-<thead>
-<tr>
-    <th scope="col">#</th>
-    <th scope="col">#</th>
-    <th scope="col">#</th>
-    <th scope="col">#</th>
-    <th scope="col">#</th>
-</tr>
-</thead>
+    <div class="container bg-white my-3 p-4 shadow">
+        <div class="row justify-content-center">
+            <div class="col-lg-12">
+            <h1>Saved Events</h1>
+                <ul>
+                    {% for event in events %}
+                        <li>
+                        {{ event }}
+                            <a href="{% url 'update-event' event.id %}">, Favorite(Update)</a>
+                            <a href="{% url 'delete-event' event.id %}">, Removed From Saved Events(Delete)</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
 
-<tbody>
-
-</tbody>
 {% endblock %}

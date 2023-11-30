@@ -45,3 +45,8 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['password1'].widget.attrs.update({'class': 'form-control m-2'})
         self.fields['password2'].widget.attrs.update({'class': 'form-control m-2'})
 
+
+class SavedEventsForm(forms.ModelForm):
+    class Meta:
+        model = SavedEvents
+        fields = '__all__'

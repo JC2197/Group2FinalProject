@@ -1,25 +1,27 @@
 {% extends 'base.html' %}
 
+{% block title %}
+    Ticketmaster Search
+{% endblock %}
+
 {% block body %}
 <div class="container-fluid bg-primary text-white">
     <div class="row justify-content-center">
         <div class="col-lg-9">
             <h1 class="display-5 text-center pt-5">Ticketmaster</h1>
             <h2 class="fw-bold text-center pb-5">Quickly find tickets around you</h2>
-
-            <form action="{% url 'search-results' %}" method="post">
+            <form action="" method="post">
                 {% csrf_token %}
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search by genre, artist or event" name="classification_name">
-                <input type="text" class="form-control" placeholder="Enter a city e.g., Hartford" name="city">
-                <button class="btn btn-danger" type="submit">SEARCH</button>
-            </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Search by genre, artist or event" name="classification_name">
+                    <input type="text" class="form-control" placeholder="Enter a city e.g., Hartford" name="city">
+                    <button class="btn btn-danger" type="submit" name="search" value="SEARCH" >SEARCH</button>
+                </div>
             </form>
-
             {% for message in messages %}
-               <div class="alert alert-danger" role="alert">
-                  <h4>{{ message }}</h4>
-               </div>
+                <div class="alert alert-danger" role="alert">
+                    <h4>{{ message }}</h4>
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -47,9 +49,20 @@
                                         <h5>{{ event.event_time }}</h5>
                                     </div>
                                 </div>
-                                <h4 class="text-secondary">{{ event.venue_name }}</h4>
-                                <p class="text-secondary mt-4">{{ event.venue_address }}<br>{{ event.venue_city }}, {{ event.venue_state }}</p>
-                                <a href="{{ event.ticket_link }}" class="btn btn-primary">Find tickets</a>
+                                <div class="row">
+                                    <div class="col-9">
+                                        <h4 class="text-secondary">{{ event.venue_name }}</h4>
+                                        <p class="text-secondary mt-4">{{ event.venue_address }}<br>{{ event.venue_city }}, {{ event.venue_state }}</p>
+                                        <a href="{{ event.ticket_link }}" class="btn btn-primary">Find tickets</a>
+                                    </div>
+                                    <div class="col-3">
+                                        <form action="" method="post">
+                                            {% csrf_token %}
+                                            {{ form.as_div }}
+                                            <input type="submit" name="save" value="Save Event" class="btn btn-info btn-lg float-end mt-5">
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
