@@ -11,11 +11,12 @@ class UserProfile(models.Model):
 
 class SavedEvents(models.Model):
     name = models.CharField(max_length=64)
-    image = models.CharField(max_length=64)
-    date = models.CharField(max_length=64)
-    time = models.CharField(max_length=64)
+    image = models.CharField(max_length=128)
+    date = models.CharField(max_length=32, blank=True)
+    time = models.CharField(max_length=16, blank=True)
     venue = models.CharField(max_length=64)
     city = models.CharField(max_length=64)
     state = models.CharField(max_length=64)
     address = models.CharField(max_length=64)
     link = models.CharField(max_length=128)
+    favorite = models.BooleanField()

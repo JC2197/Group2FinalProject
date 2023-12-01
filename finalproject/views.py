@@ -10,7 +10,6 @@ from .models import SavedEvents
 
 
 def search(request):
-
     if request.POST.get('search'):
         classification_name = request.POST['classification_name']
         city = request.POST['city']
@@ -46,7 +45,7 @@ def search(request):
                     if image['height'] == 1152:
                         event_image = image['url']
 
-                #  Some events don't have a date, so return nothing if one of these events show up
+                #  Some events don't have a date or time, so return nothing if one of these events show up
                 try:
                     event_date = event['dates']['start']['dateTime']
                     date_object = datetime.strptime(event_date[:10], "%Y-%m-%d")
@@ -77,17 +76,23 @@ def search(request):
                     'venue_city': venue_city,
                     'venue_state': venue_state,
                     'venue_address': venue_address,
-                    'ticket_link': ticket_link
+                    'ticket_link': ticket_link,
+                    'form': SavedEventsForm(initial={
+                        'name': event_name,
+                        'image': event_image,
+                        'date': event_date,
+                        'time': event_time,
+                        'venue': venue_name,
+                        'city': venue_city,
+                        'state': venue_state,
+                        'address': venue_address,
+                        'link': ticket_link,
+                        'favorite': None
+                    })
                 }
                 event_list.append(event_details)
 
-            print(event_list)
-            form = SavedEventsForm(initial={
-                'name': event_list[0],
-                'image': "test",
-                'date': event_list[3]
-            })
-            context = {'events': event_list, 'events_found': events_found, 'form': form}
+            context = {'events': event_list, 'events_found': events_found}
 
             return render(request, 'search-results.html', context)
 
@@ -130,7 +135,7 @@ def view_events(request):  # view saved events
     return render(request, 'saved-events.html', context)
 
 
-def add_event(request):
+def add_event(request):  # save event to database
     form = SavedEventsForm(request.POST or None)
     if form.is_valid():
         form.save()
@@ -138,18 +143,21 @@ def add_event(request):
     return render(request, 'search-results.html', {'form': form})
 
 
-def update_event(request, event_id):  # favorite events that are saved
-    event = SavedEvents.objects.get(id=event_id)
+def update_event(request, id):  # favorite events that are saved
+    event = SavedEvents.objects.get(id=id)
     form = SavedEventsForm(request.POST or None, instance=event)
+    favorite = form.save(commit=False)
+    favorite.favorite = 1 - favorite.favorite  # swaps between true and false whenever favorite is clicked
+    favorite.save()
     if form.is_valid():
         form.save()
         return redirect('view-events')
     return render(request, 'search-results.html', {'form': form})
 
 
-def delete_event(request, event_id):  # delete events from saved database
-    event = SavedEvents.objects.get(id=event_id)
+def delete_event(request, id):  # delete events from saved database
+    event = SavedEvents.objects.get(id=id)
     if request.method == 'POST':
         event.delete()
         return redirect('view-events')
-    return render(request, 'saved-events.html')
+    return render(request, 'delete-confirm.html', {'event': event})
