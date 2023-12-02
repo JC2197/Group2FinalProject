@@ -152,7 +152,9 @@ def update_event(request, id):  # favorite events that are saved
     if form.is_valid():
         form.save()
         return redirect('view-events')
-    return render(request, 'search-results.html', {'form': form})
+    events = SavedEvents.objects.all()
+    context = {'events': events}
+    return render(request, 'saved-events.html', context)
 
 
 def delete_event(request, id):  # delete events from saved database
