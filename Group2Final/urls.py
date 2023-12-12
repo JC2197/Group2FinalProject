@@ -24,18 +24,13 @@ from finalproject.views import signup
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     path('', RedirectView.as_view(url='/signup/'), name='redirect_to_signup'),
     path('signup/', signup, name='signup'),
-    path('login/', LoginView.as_view(
-        authentication_form=BootstrapAuthenticationForm,
-        template_name='login.html'
-    ), name='login'),
-
+    path('login/', views.login_view, name='login'),
     path('search-results/', views.search, name='search-results'),
-
     path('add-event/', views.add_event, name='add-event'),  # C, add events to database
     path('view-events/', views.view_events, name='view-events'),  # R, retrieve events from database to view
-    path('update/<int:id>', views.update_event, name='update-event'),  # U, update event to favorites or unfavorite
+    path('update/<int:event_id>', views.update_event, name='update-event'),  # U, update event to favorites or unfavorite
+    path('logout/', views.logout_view, name='logout'),
     path('delete/<int:id>', views.delete_event, name='delete-event'),  # D, delete event from saved events database
 ]

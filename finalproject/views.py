@@ -3,12 +3,14 @@ from datetime import datetime
 import requests
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from .forms import *
 from .models import SavedEvents
 
 
+@login_required()
 def search(request):
     if request.POST.get('search'):
         classification_name = request.POST['classification_name']
@@ -99,6 +101,13 @@ def search(request):
     return render(request, 'search-results.html')
 
 
+def logout_view(request):
+    # This is the method to log out the user
+    logout(request)
+    # redirect the user to index page after logout
+    return redirect('login')
+
+
 def get_ticketmaster_search(classification_name, city, sort):
     try:
         url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=uR0EVsl1GNv6kaCf2DggXqQURjGEw1fe"
@@ -117,6 +126,8 @@ def get_ticketmaster_search(classification_name, city, sort):
 
 
 def signup(request):
+    if request.user.is_authenticated:
+        return redirect('search-results')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -129,32 +140,78 @@ def signup(request):
     return render(request, 'landing.html', context)
 
 
+@login_required(login_url='login')
 def view_events(request):  # view saved events
-    events = SavedEvents.objects.all()
+    events = SavedEvents.objects.filter(user=request.user)
     context = {'events': events}
     return render(request, 'saved-events.html', context)
 
 
-def add_event(request):  # save event to database
+@login_required(login_url='login')
+def add_event(request):
     form = SavedEventsForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('view-events')
+
+    if request.method == 'POST':
+        # Check if a similar event already exists in the database
+        similar_events = SavedEvents.objects.filter(
+            user=request.user,
+            name=form.data.get('name'),
+            date=form.data.get('date'),
+            venue=form.data.get('venue'),
+            city=form.data.get('city'),
+            state=form.data.get('state'),
+            address=form.data.get('address'),
+            link=form.data.get('link'),
+        )
+
+        if similar_events.exists():
+            # Handle the case when a similar event already exists
+            return render(request, 'event_exists.html')
+
+        # If no similar event exists and the form is valid, proceed with saving the new event
+        if form.is_valid():
+            form.instance.user = request.user
+            form.save()
+            return redirect('view-events')
+
     return render(request, 'search-results.html', {'form': form})
 
 
-def update_event(request, id):  # favorite events that are saved
-    event = SavedEvents.objects.get(id=id)
+@login_required(login_url='login')
+def update_event(request, event_id):  # favorite events that are saved
+    event = SavedEvents.objects.get(id=event_id, user=request.user)
     form = SavedEventsForm(request.POST or None, instance=event)
     favorite = form.save(commit=False)
     favorite.favorite = 1 - favorite.favorite  # swaps between true and false whenever favorite is clicked
     favorite.save()
     if form.is_valid():
+        form.instance.user = request.user
         form.save()
         return redirect('view-events')
-    events = SavedEvents.objects.all()
+    events = SavedEvents.objects.filter(user=request.user)
     context = {'events': events}
     return render(request, 'saved-events.html', context)
+
+
+def login_view(request):
+    # this function authenticates the user based on username and password
+    # AuthenticationForm is a form for logging a user in.
+    # if the request method is a post
+    if request.method == 'POST':
+        # Plug the request.post in AuthenticationForm
+        form = BootstrapAuthenticationForm(data=request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # get the user info from the form data and login the user
+            user = form.get_user()
+            login(request, user)
+            # redirect the user to index page
+            return redirect('search-results')
+    else:
+        # Create an empty instance of Django's AuthenticationForm to generate the necessary html on the template.
+        form = BootstrapAuthenticationForm()
+
+    return render(request, 'login.html', {'form': form})
 
 
 def delete_event(request, id):  # delete events from saved database

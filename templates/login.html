@@ -14,7 +14,11 @@
                     <form action="{% url 'login' %}" method="post" class="form-group">
                         {% csrf_token %}
                         <h2 class="text-center">Sign In</h2>
-                        <div class="form-group"> {{ form.as_div }}</div>
+                        <div class="row">
+                            <div class="col-4"></div>
+                            <div class="col-4 form-group"> {{ form.as_div }}</div>
+                            <div class="col-4"></div>
+                        </div>
                         <div class="container text-center">
                             <input type="submit" class="btn btn-warning m-2" value="Submit">
                         </div>

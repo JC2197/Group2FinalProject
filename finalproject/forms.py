@@ -49,4 +49,4 @@ class CustomUserCreationForm(UserCreationForm):
 class SavedEventsForm(forms.ModelForm):
     class Meta:
         model = SavedEvents
-        fields = '__all__'
+        exclude = ['user']

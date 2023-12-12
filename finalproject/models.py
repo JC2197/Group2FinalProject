@@ -10,6 +10,7 @@ class UserProfile(models.Model):
 
 
 class SavedEvents(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=64)
     image = models.CharField(max_length=128)
     date = models.CharField(max_length=32, blank=True)
