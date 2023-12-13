@@ -13,6 +13,11 @@
                 {% block content %}
                     <form action="{% url 'login' %}" method="post" class="form-group">
                         {% csrf_token %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
                         <h2 class="text-center">Sign In</h2>
                         <div class="row">
                             <div class="col-4"></div>

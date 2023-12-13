@@ -128,14 +128,21 @@ def get_ticketmaster_search(classification_name, city, sort):
 def signup(request):
     if request.user.is_authenticated:
         return redirect('search-results')
+
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, 'Account created successfully. You are now logged in.')
             return redirect('login')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{error}")
     else:
         form = CustomUserCreationForm()
+
     context = {'form': form}
     return render(request, 'landing.html', context)
 
@@ -194,23 +201,14 @@ def update_event(request, event_id):  # favorite events that are saved
 
 
 def login_view(request):
-    # this function authenticates the user based on username and password
-    # AuthenticationForm is a form for logging a user in.
-    # if the request method is a post
     if request.method == 'POST':
-        # Plug the request.post in AuthenticationForm
         form = BootstrapAuthenticationForm(data=request.POST)
-        # check whether it's valid:
         if form.is_valid():
-            # get the user info from the form data and login the user
             user = form.get_user()
             login(request, user)
-            # redirect the user to index page
             return redirect('search-results')
     else:
-        # Create an empty instance of Django's AuthenticationForm to generate the necessary html on the template.
         form = BootstrapAuthenticationForm()
-
     return render(request, 'login.html', {'form': form})
 
 
